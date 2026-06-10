@@ -1,0 +1,18 @@
+# Seata 分布式事务配置（与 ShardingSphere 配合使用）
+seata:
+  enabled: true
+  application-id: waimai-backend
+  tx-service-group: waimai_tx_group
+  config:
+    type: file
+    file:
+      name: file.conf
+  registry:
+    type: file
+  service:
+    grouplist:
+      default: ${SEATA_SERVER:localhost}:8091
+  client:
+    undo:
+      log-table: undo_log
+      only-care-update-columns: true

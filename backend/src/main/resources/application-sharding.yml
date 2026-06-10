@@ -1,0 +1,9 @@
+# =============================================
+# ShardingSphere-JDBC 分库分表 + 读写分离配置
+# 订单表按 user_id 水平拆分：4 库 × 2 表 = 8 分片
+# =============================================
+spring:
+  datasource:
+    # 覆盖主数据源为 ShardingSphere 数据源
+    driver-class-name: org.apache.shardingsphere.driver.ShardingSphereDriver
+    url: jdbc:shardingsphere:classpath:sharding-config.yaml

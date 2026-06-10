@@ -1,0 +1,22 @@
+server:
+  port: 7091
+
+spring:
+  application:
+    name: seata-server
+
+logging:
+  level:
+    io.seata: info
+
+seata:
+  config:
+    type: file
+  registry:
+    type: file
+    file:
+      name: file.conf
+  store:
+    mode: file
+  server:
+    service-port: 8091

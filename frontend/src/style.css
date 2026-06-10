@@ -1,0 +1,282 @@
+/* ============================================
+   全局样式 — 仿美团外卖 · 纯移动端
+   宽度固定 480px 居中，不做响应式
+   ============================================ */
+
+:root {
+  /* 美团配色 */
+  --mt-yellow: #FFD101;
+  --mt-yellow-dark: #FFB800;
+  --mt-yellow-light: #FFF8E1;
+  --mt-orange: #FF6B35;
+  --mt-red: #FF4D4F;
+  --mt-green: #52C41A;
+
+  /* 文字 */
+  --mt-text: #1A1A1A;
+  --mt-text2: #666666;
+  --mt-text3: #999999;
+  --mt-text4: #BBBBBB;
+
+  /* 背景 */
+  --mt-bg: #F5F5F5;
+  --mt-white: #FFFFFF;
+  --mt-border: #F0F0F0;
+
+  /* 圆角阴影 */
+  --mt-radius: 8px;
+  --mt-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  --mt-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* ---------- Reset ---------- */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue',
+    'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  background: #EEE;
+  color: var(--mt-text);
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.4;
+  overflow-x: hidden;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* ---------- App 容器：480px 居中 ---------- */
+#app {
+  width: 100%;
+  max-width: 480px;
+  min-height: 100vh;
+  margin: 0 auto;
+  background: var(--mt-bg);
+  position: relative;
+  overflow-x: hidden;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.12);
+}
+
+/* ---------- 页面基础容器 ---------- */
+.page {
+  min-height: 100vh;
+  background: var(--mt-bg);
+  padding-bottom: 64px; /* 给底部导航留空间 */
+}
+
+.page-no-nav {
+  padding-bottom: 0;
+}
+
+/* ---------- 通用渐变头部 ---------- */
+.header-gradient {
+  background: linear-gradient(180deg, var(--mt-yellow) 0%, var(--mt-yellow-dark) 100%);
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--mt-text);
+  flex-shrink: 0;
+}
+
+.header-gradient-tall {
+  background: linear-gradient(180deg, var(--mt-yellow) 0%, var(--mt-yellow) 50%, var(--mt-yellow-light) 100%);
+  padding: 20px 16px 30px;
+}
+
+/* ---------- 通用白色卡片 ---------- */
+.card {
+  background: var(--mt-white);
+  border-radius: var(--mt-radius);
+  box-shadow: var(--mt-shadow);
+  padding: 14px;
+  margin: 10px 12px;
+}
+
+/* ---------- 底部固定导航栏 ---------- */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 480px;
+  height: 56px;
+  background: var(--mt-white);
+  display: flex;
+  border-top: 1px solid var(--mt-border);
+  z-index: 100;
+  box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.04);
+}
+
+.bottom-nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  color: var(--mt-text3);
+  cursor: pointer;
+  gap: 2px;
+  transition: color 0.15s;
+}
+
+.bottom-nav-item.active {
+  color: var(--mt-yellow-dark);
+  font-weight: 600;
+}
+
+/* ---------- 底部操作栏（通用） ---------- */
+.bottom-bar {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 480px;
+  height: 52px;
+  background: var(--mt-white);
+  display: flex;
+  align-items: center;
+  z-index: 99;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* ---------- CSS 变量覆盖 Easy…… ---------- */
+.text-primary { color: var(--mt-text); }
+.text-secondary { color: var(--mt-text2); }
+.text-muted { color: var(--mt-text3); }
+.price { color: var(--mt-orange); font-weight: 700; }
+
+/* ---------- 动画 ---------- */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.fade-in-up {
+  animation: fadeInUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+/* 页面切换过渡 */
+.page-fade-enter-active,
+.page-fade-leave-active {
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.page-fade-enter-from {
+  opacity: 0;
+  transform: translateY(6px);
+}
+.page-fade-leave-to {
+  opacity: 0;
+  transform: translateY(-6px);
+}
+
+/* 骨架屏 shimmer */
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg, #F0F0F0 25%, #E8E8E8 50%, #F0F0F0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: var(--mt-radius);
+}
+
+/* 弹跳动画 */
+@keyframes bounceIn {
+  0%   { transform: scale(0.3); opacity: 0; }
+  50%  { transform: scale(1.15); }
+  70%  { transform: scale(0.95); }
+  100% { transform: scale(1); opacity: 1; }
+}
+.bounce-in {
+  animation: bounceIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ---------- 通用工具类 ---------- */
+.text-center { text-align: center; }
+.flex-center { display: flex; align-items: center; justify-content: center; }
+.gap-8 { gap: 8px; }
+.gap-12 { gap: 12px; }
+.mt-8 { margin-top: 8px; }
+.mt-12 { margin-top: 12px; }
+.px-14 { padding-left: 14px; padding-right: 14px; }
+
+/* ---------- Element Plus 全局覆盖 ---------- */
+.el-button--warning {
+  --el-button-bg-color: var(--mt-yellow-dark);
+  --el-button-border-color: var(--mt-yellow-dark);
+  --el-button-hover-bg-color: #FFA000;
+  --el-button-hover-border-color: #FFA000;
+  --el-button-active-bg-color: #E69900;
+  --el-button-active-border-color: #E69900;
+}
+
+.el-tabs__active-bar { background-color: var(--mt-yellow-dark) !important; }
+.el-tabs__item.is-active { color: var(--mt-yellow-dark) !important; }
+.el-tabs__item:hover { color: var(--mt-yellow-dark) !important; }
+
+.el-rate { --el-rate-fill-color: var(--mt-yellow-dark); }
+
+.el-card {
+  border-radius: var(--mt-radius) !important;
+  border: none !important;
+  box-shadow: var(--mt-shadow) !important;
+}
+
+.el-dialog {
+  border-radius: 12px !important;
+  max-width: 440px !important;
+}
+
+.el-overlay {
+  /* 弹窗遮罩限制在480px内 */
+  left: 50% !important;
+  transform: translateX(-50%);
+  width: 100% !important;
+  max-width: 480px !important;
+}
+
+/* 抽屉也限制宽度 */
+.el-drawer {
+  max-width: 480px !important;
+  margin: 0 auto !important;
+}
+
+/* 重写 Drawer 底部弹出样式 */
+.el-drawer.btt {
+  max-width: 480px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  border-radius: 16px 16px 0 0 !important;
+}
+
+/* Radio Button 覆盖 */
+.el-radio-button__original-radio:checked + .el-radio-button__inner {
+  background-color: var(--mt-yellow-dark) !important;
+  border-color: var(--mt-yellow-dark) !important;
+  color: #FFF !important;
+}
+
+/* Switch 激活色 */
+.el-switch.is-checked .el-switch__core {
+  background-color: var(--mt-yellow-dark) !important;
+  border-color: var(--mt-yellow-dark) !important;
+}

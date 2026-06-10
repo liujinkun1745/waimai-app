@@ -1,0 +1,33 @@
+# Logs
+*.log
+logs/
+
+# Dependencies
+node_modules/
+.mvn/wrapper/maven-wrapper.jar
+
+# Build output
+dist/
+dist-ssr/
+target/
+build-*/
+
+# IDE
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+*.local
+.env
+.env.*
+
+# Temp
+*.tmp
+*.bak
+.plan3-backup/
