@@ -4,7 +4,6 @@ logs/
 
 # Dependencies
 node_modules/
-.mvn/wrapper/maven-wrapper.jar
 
 # Build output
 dist/
