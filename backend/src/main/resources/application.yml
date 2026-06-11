@@ -14,8 +14,8 @@ spring:
   # 数据库配置
   datasource:
     url: jdbc:mysql://localhost:3306/waimai?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&createDatabaseIfNotExist=true
-    username: root
-    password: 123456
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:123456}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   # JPA 配置
@@ -65,7 +65,7 @@ server:
 
 # JWT 配置
 jwt:
-  secret: waimai-platform-jwt-secret-key-2024-must-be-at-least-256-bits-long
+  secret: ${JWT_SECRET:waimai-platform-jwt-secret-key-2024-must-be-at-least-256-bits-long}
   access-token-expiration: 1800000     # 30 分钟
   refresh-token-expiration: 604800000  # 7 天
 
