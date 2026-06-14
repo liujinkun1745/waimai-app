@@ -5,11 +5,13 @@ import com.waimai.dto.request.*;
 import com.waimai.dto.response.Result;
 import com.waimai.entity.*;
 import com.waimai.service.*;
+import com.waimai.service.CartCacheService.CartItemDTO;
 import com.waimai.service.OrderService.CartItem;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -37,6 +39,8 @@ public class ConsumerController {
     private final CouponService couponService;
     private final JwtUtil jwtUtil;
 
+    @Autowired(required = false)
+    private CartCacheService cartCacheService;
     private User currentUser(String token) {
         String jwt = token.replace("Bearer ", "");
         String username = jwtUtil.getUsername(jwt);
@@ -128,6 +132,74 @@ public class ConsumerController {
         return Result.success(productService.listByCategory(merchantId, categoryId));
     }
 
+    // ========== 购物车 ==========
+
+    @GetMapping("/cart")
+    @Operation(summary = "获取购物车")
+    public Result<List<CartItemDTO>> getCart(
+            @RequestHeader("Authorization") String token,
+            @RequestParam Long merchantId) {
+        User user = currentUser(token);
+        if (cartCacheService == null) {
+            return Result.success(List.of());
+        }
+        return Result.success(cartCacheService.getCart(user.getId(), merchantId));
+    }
+
+    @PostMapping("/cart/add")
+    @Operation(summary = "加入购物车")
+    public Result<Void> addToCart(
+            @RequestHeader("Authorization") String token,
+            @Valid @RequestBody AddToCartRequest request) {
+        User user = currentUser(token);
+        if (cartCacheService != null) {
+            Product product = productService.findById(request.getProductId());
+            cartCacheService.addItem(user.getId(), request.getMerchantId(),
+                    product.getId(), product.getName(), product.getImage(),
+                    product.getPrice(), request.getQuantity());
+        }
+        return Result.success();
+    }
+
+    @PutMapping("/cart/{productId}")
+    @Operation(summary = "更新购物车商品数量")
+    public Result<Void> updateCartItem(
+            @RequestHeader("Authorization") String token,
+            @PathVariable Long productId,
+            @Valid @RequestBody UpdateCartRequest request) {
+        User user = currentUser(token);
+        if (cartCacheService != null) {
+            cartCacheService.updateQuantity(user.getId(), request.getMerchantId(),
+                    productId, request.getQuantity());
+        }
+        return Result.success();
+    }
+
+    @DeleteMapping("/cart/{productId}")
+    @Operation(summary = "删除购物车单个商品")
+    public Result<Void> removeCartItem(
+            @RequestHeader("Authorization") String token,
+            @PathVariable Long productId,
+            @RequestParam Long merchantId) {
+        User user = currentUser(token);
+        if (cartCacheService != null) {
+            cartCacheService.removeItem(user.getId(), merchantId, productId);
+        }
+        return Result.success();
+    }
+
+    @DeleteMapping("/cart")
+    @Operation(summary = "清空购物车")
+    public Result<Void> clearCart(
+            @RequestHeader("Authorization") String token,
+            @RequestParam Long merchantId) {
+        User user = currentUser(token);
+        if (cartCacheService != null) {
+            cartCacheService.clearCart(user.getId(), merchantId);
+        }
+        return Result.success();
+    }
+
     // ========== 订单 ==========
 
     @GetMapping("/orders")
@@ -203,6 +275,11 @@ public class ConsumerController {
         }
         orderService.submitOrder(user.getId(), request.getMerchantId(),
                 request.getAddressId(), cartItems, finalAmount);
+        if (cartCacheService != null) {
+            for (SubmitOrderRequest.CartItemRequest item : request.getItems()) {
+                cartCacheService.removeItem(user.getId(), request.getMerchantId(), item.getProductId());
+            }
+        }
         return Result.success();
     }
 

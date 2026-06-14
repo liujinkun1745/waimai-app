@@ -35,4 +35,11 @@ export const consumerApi = {
   recharge: (data: any) => request.post('/consumer/balance/recharge', data),
   // 搜索
   search: (keyword?: string) => request.get('/consumer/search', { params: { keyword } }),
+  // 购物车
+  getCart: (merchantId: number) => request.get('/consumer/cart', { params: { merchantId } }),
+  addToCart: (data: any) => request.post('/consumer/cart/add', data),
+  updateCartItem: (productId: number, data: any) => request.put(`/consumer/cart/${productId}`, data),
+  removeCartItem: (productId: number, merchantId: number) =>
+    request.delete(`/consumer/cart/${productId}`, { params: { merchantId } }),
+  clearCart: (merchantId: number) => request.delete('/consumer/cart', { params: { merchantId } }),
 }

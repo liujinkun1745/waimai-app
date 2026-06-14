@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
+import { consumerApi } from '@/api/consumer'
 
 interface CartItem {
   productId: number
@@ -21,12 +22,20 @@ export const useCartStore = defineStore('cart', () => {
     items.value.reduce((sum, item) => sum + item.quantity, 0)
   )
 
-  function setMerchant(id: number, name: string) {
+  async function setMerchant(id: number, name: string) {
     if (merchantId.value !== id) {
-      items.value = []
       merchantId.value = id
       merchantName.value = name
-      loadFromStorage(id)
+      items.value = []
+
+      // 优先从服务端加载（Redis），失败则回退 localStorage
+      const serverItems = await consumerApi.getCart(id)
+      if (serverItems && serverItems.length > 0) {
+        items.value = serverItems
+        saveToStorage()
+      } else {
+        loadFromStorage(id)
+      }
     }
   }
 
@@ -44,26 +53,35 @@ export const useCartStore = defineStore('cart', () => {
       })
     }
     saveToStorage()
+    // 异步同步到 Redis（不阻塞 UI）
+    consumerApi.addToCart({ merchantId: merchantId.value, productId: product.id, quantity })
   }
 
   function removeItem(productId: number) {
     items.value = items.value.filter(i => i.productId !== productId)
     saveToStorage()
+    consumerApi.removeCartItem(productId, merchantId.value!)
   }
 
   function updateQuantity(productId: number, quantity: number) {
+    if (quantity <= 0) {
+      removeItem(productId)
+      return
+    }
     const item = items.value.find(i => i.productId === productId)
     if (item) {
       item.quantity = quantity
-      if (item.quantity <= 0) removeItem(productId)
     }
     saveToStorage()
+    consumerApi.updateCartItem(productId, { merchantId: merchantId.value, quantity })
   }
 
   function clear() {
     items.value = []
-    if (merchantId.value)
+    if (merchantId.value) {
       localStorage.removeItem(`waimai_cart_${merchantId.value}`)
+      consumerApi.clearCart(merchantId.value)
+    }
   }
 
   function saveToStorage() {

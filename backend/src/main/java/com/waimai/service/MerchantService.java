@@ -4,6 +4,7 @@ import com.waimai.entity.Merchant;
 import com.waimai.exception.BusinessException;
 import com.waimai.repository.MerchantRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,6 +16,9 @@ import java.util.List;
 public class MerchantService {
 
     private final MerchantRepository merchantRepository;
+
+    @Autowired(required = false)
+    private MerchantCacheService cacheService;
 
     public Merchant findByUserId(Long userId) {
         return merchantRepository.findByUserId(userId)
@@ -34,7 +38,17 @@ public class MerchantService {
     }
 
     public List<Merchant> listBySales() {
-        return merchantRepository.findByStatusOrderByMonthlySalesDesc("营业中");
+        if (cacheService != null) {
+            List<Merchant> cached = cacheService.getHotMerchants();
+            if (cached != null) {
+                return cached;
+            }
+        }
+        List<Merchant> merchants = merchantRepository.findByStatusOrderByMonthlySalesDesc("营业中");
+        if (cacheService != null) {
+            cacheService.setHotMerchants(merchants);
+        }
+        return merchants;
     }
 
     public List<Merchant> listByRating() {
@@ -55,6 +69,10 @@ public class MerchantService {
         merchant.setDeliveryFee(deliveryFee);
         merchant.setMinOrderAmount(minOrderAmount);
         merchantRepository.save(merchant);
+        if (cacheService != null) {
+            cacheService.evictHotMerchants();
+            cacheService.evictMerchantDetail(merchantId);
+        }
     }
 
     @Transactional
@@ -66,5 +84,9 @@ public class MerchantService {
             merchant.setStatus("营业中");
         }
         merchantRepository.save(merchant);
+        if (cacheService != null) {
+            cacheService.evictHotMerchants();
+            cacheService.evictMerchantDetail(merchantId);
+        }
     }
 }
